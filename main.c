@@ -17,6 +17,9 @@ int **init_grid(int sz)
 {
 	struct grid_info *puzzle = malloc(sizeof(struct grid_info));
 
+	puzzle->sz = sz;
+	puzzle->xpos = sz-1;
+	puzzle->ypos = sz-1;
 	puzzle->grid = malloc(sz*sizeof(int *));
 	for (int i = 0; i < sz; i++) {
 		puzzle->grid[i] = malloc(sz*sizeof(int));
@@ -34,8 +37,8 @@ void scramble_grid(struct grid_info *grid, int num)
 
 void print_grid(struct grid_info *puzzle)
 {
-	for (int i = 0; i < sz; i++) {
-		for (int j = 0; j < sz; j++) {
+	for (int i = 0; i < puzzle->sz; i++) {
+		for (int j = 0; j < puzzle->sz; j++) {
 			printf("%d\t", puzzle->grid[i][j]);
 		}
 		printf("\n");
@@ -52,7 +55,7 @@ void usage()
 int main(int argc, char ** argv)
 {
 	int sz = 3;
-	struct grid_info puzzle;
+	struct grid_info *puzzle;
 
 	if (argc > 2)
 		usage();
@@ -63,7 +66,7 @@ int main(int argc, char ** argv)
 	}
 
 	puzzle = init_grid(sz);
-	print_grid(&grid);
+	print_grid(puzzle);
 
 	return EXIT_SUCCESS;
 }
