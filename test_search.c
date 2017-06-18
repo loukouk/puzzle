@@ -21,14 +21,14 @@ int main() {
 	vals[5] = -2;
 
 	search = init_search(vals, srch);
-	printf("Search Results: %d items not found\n", search_grid(puzzle, search));
-	search_print(search);
+	printf("Search Results: %d items not found\n", apply_search(puzzle, search));
+	print_search(search);
 
 	srand(time(NULL));
 	scramble_grid(puzzle, 1000);
 	print_grid(puzzle);
 
-	printf("Search Results: %d items not found\n", search_grid(puzzle, search));
-	search_print(search);
+	printf("Search Results: %d items not found\n", apply_search(puzzle, search));
+	print_search(search);
 }
 

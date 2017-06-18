@@ -15,8 +15,8 @@ struct search_info {
 
 struct search_info *init_search(int *vals, int sz);
 
-int search_grid(struct grid_info *puzzle, struct search_info *search);
+int apply_search(struct grid_info *puzzle, struct search_info *search);
 
-void search_print(struct search_info *search);
+void print_search(struct search_info *search);
 
 #endif

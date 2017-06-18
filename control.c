@@ -1,5 +1,17 @@
 #include "control.h"
 
+/*
+ * Function: move_right
+ * --------------------
+ * 
+ * Moves the tile to the right of the hole into the hole
+ * Hole appears to move to the right one space
+ *
+ * puzzle: The structure that holds the tiles to be moved
+ *
+ * returns 1 if user called for an illigal move
+ * returns 0 on success
+ */
 int move_right(struct grid_info *puzzle)
 {
 	int x = puzzle->xpos;
@@ -16,6 +28,18 @@ int move_right(struct grid_info *puzzle)
 	return 0;	
 }
 
+/*
+ * Function: move_left
+ * -------------------
+ * 
+ * Moves the tile to the left of the hole into the hole
+ * Hole appears to move to the left one space
+ *
+ * puzzle: The structure that holds the tiles to be moved
+ *
+ * returns 1 if user called for an illigal move
+ * returns 0 on success
+ */
 int move_left(struct grid_info *puzzle)
 {
 	int x = puzzle->xpos;
@@ -32,6 +56,18 @@ int move_left(struct grid_info *puzzle)
 	return 0;	
 }
 
+/*
+ * Function: move_down
+ * -------------------
+ * 
+ * Moves the tile below the hole into the hole
+ * Hole appears to move down one space
+ *
+ * puzzle: The structure that holds the tiles to be moved
+ *
+ * returns 1 if user called for an illigal move
+ * returns 0 on success
+ */
 int move_down(struct grid_info *puzzle)
 {
 	int x = puzzle->xpos;
@@ -48,6 +84,18 @@ int move_down(struct grid_info *puzzle)
 	return 0;	
 }
 
+/*
+ * Function: move_up
+ * -----------------
+ * 
+ * Moves the tile above the hole into the hole
+ * Hole appears to move up one space
+ *
+ * puzzle: The structure that holds the tiles to be moved
+ *
+ * returns 1 if user called for an illigal move
+ * returns 0 on success
+ */
 int move_up(struct grid_info *puzzle)
 {
 	int x = puzzle->xpos;
@@ -64,6 +112,14 @@ int move_up(struct grid_info *puzzle)
 	return 0;	
 }
 
+/*
+ * Function: print_grid
+ * --------------------
+ *
+ * Prints the tiles as a table to stdout
+ *
+ * puzzle: structure containing tiles to be printed
+ */
 void print_grid(struct grid_info *puzzle)
 {
 	for (int j = 0; j < puzzle->sz; j++) {
@@ -75,6 +131,18 @@ void print_grid(struct grid_info *puzzle)
 	printf("\n");
 }
 
+/*
+ * Function: init_grid
+ * -------------------
+ *
+ * Initializes a grid_info structure.
+ * It allocates memory for the 2d array (grid)
+ * and sets other variables to default values
+ *
+ * sz: Size of the grid to be initialized (if sz=3, grid is 3x3)
+ *
+ * returns a pointer to the initialized structure
+ */
 struct grid_info *init_grid(int sz)
 {
 	struct grid_info *puzzle = malloc(sizeof(struct grid_info));
@@ -92,6 +160,15 @@ struct grid_info *init_grid(int sz)
 	return puzzle;
 }
 
+/*
+ * Function: scramble_grid
+ * -----------------------
+ *
+ * Scrambles the tiles in a grid randomly by calling
+ * the move_up/down/right/left functions at random
+ *
+ * puzzle: Structure containing grid to be scrambled
+ */
 void scramble_grid(struct grid_info *puzzle, int num)
 {
 
@@ -106,6 +183,18 @@ void scramble_grid(struct grid_info *puzzle, int num)
 	}
 }
 
+/*
+ * Function: is_win
+ * ----------------
+ *
+ * Checks if the puzzle has been solved by comparing
+ * the values of all tiles to the initial state
+ *
+ * puzzle: Structure containing tiles to be checked
+ *
+ * returns 1 if all tiles match the initial state setup
+ * returns 0 if even a single tile is out of place
+ */
 int is_win(struct grid_info *puzzle)
 {
 	int sz = puzzle->sz;

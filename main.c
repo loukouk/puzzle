@@ -1,11 +1,47 @@
 #include "main.h"
-
+extern char *optarg;
+/*
+ * Function: usage
+ * ---------------
+ *
+ * Prints instructions on how to use program from the 
+ * command line and exits
+ */
 void usage()
 {
-	printf("Usage: ./puzzle <grid size>\n\tGrid must be min 3x3.\n");
-	exit(EXIT_FAILURE);
+	printf( "\nUsage: ./puzzle [-hp] [-x x_size] [-y y_size]\n"
+		"Grid must be size 2x2 minimum.\n\n");
+	exit(EXIT_SUCCESS);
 }
 
+void print_help()
+{
+	printf( "\nThis program is an implementation of the 15 puzzle game. "
+		"The goal of the program is to be able to create an AI that can solve the puzzle "
+		"reguardless of the size of the grid. That does include non-square grids. "
+		"Eventually, a performance analysis of the AI algorithm will be done to try "
+		"finding methods of improving runtime for large grids.\n\n"
+		"Command-line arguments:\n"
+		"\t-h\n"
+		"\t\tPrints the help message, as well as the usage string.\n\n"
+		"\t-p\n"
+		"\t\tLets the user solve the puzzle instead of solving it by itself.\n\n"
+		"\t-x\n"
+		"\t\tLets the user specify the width of the grid to be used for the puzzle.\n\n"
+		"\t-y\n"
+		"\t\tLets the user specify the height of the grid to be used for the puzzle.\n\n");
+}
+
+/*
+ * Function: user_solve
+ * --------------------
+ *
+ * Takes input from the user and applies the user's commands to
+ * the grid being modified. This function only exits once the user
+ * has solved the puzzle
+ *
+ * puzzle: Pointer to structure containing the grid the user is playing with
+ */
 void user_solve(struct grid_info *puzzle)
 {
 	char c;
@@ -29,11 +65,31 @@ void user_solve(struct grid_info *puzzle)
 }
 
 
+/*
+ * Function: auto_solve_3x3
+ * ------------------------
+ *
+ * AI that will solve the puzzle by itself.
+ * This function is only meant to solve 3x3 puzzles.
+ * It is a stepping stone to implementing auto_solve().
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ */
 void auto_solve_3x3(struct grid_info *puzzle)
 {
 	
 }
 
+/*
+ * Function: auto_solve
+ * --------------------
+ *
+ * Will eventually solve any puzzle that is passed in to the function
+ * reguardless of the size of the grid. Ideally, this will also work
+ * with non-square grids. For now, it only calls auto_solve_3x3().
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ */
 void auto_solve(struct grid_info *puzzle)
 {
 	if (puzzle->sz > 3) {
@@ -44,17 +100,48 @@ void auto_solve(struct grid_info *puzzle)
 	auto_solve_3x3(puzzle);
 }
 
+/*
+ * Function: main
+ * --------------
+ *
+ * Interprets command line arguments to change grid sizes.
+ * Calls initilization methods and gives control of the
+ * puzzle to the user or to the AI
+ *
+ * argc: number of command line arguments
+ * argv: Array of strings representing command line args
+ *
+ * returns EXIT_SUCCESS on program's successful exit
+ * returns EXIT_FAILURE or error code otherwise
+ */
 int main(int argc, char ** argv)
 {
-	int sz = 3, player = 1;
+	int sz = 3, player = 0, szx = 3, szy = 3;
 	struct grid_info *puzzle;
+	char c;
 
-	if (argc > 2)
-		usage();
-	else if (argc == 2) {
-		sz = atoi(argv[1]);
-		if (sz < 3)
-			usage();
+	while ((c = getopt (argc, argv, "hpx:y:")) != -1) {
+		switch(c) {
+			case 'h':
+				print_help();	
+				usage();
+				break;
+			case 'p':
+				player = 1;
+				break;
+			case 'x':	
+				szx = atoi(optarg);
+				if (szx < 2)
+					usage();
+				break;
+			case 'y':
+				szy = atoi(optarg);
+				if (szy < 2)
+					usage();
+				break;
+			default:
+				usage();
+		}
 	}
 
 	srand(time(NULL));
