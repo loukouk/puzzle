@@ -18,6 +18,7 @@ int move_right(struct grid_info *puzzle);
 int move_left(struct grid_info *puzzle);
 int move_up(struct grid_info *puzzle);
 int move_down(struct grid_info *puzzle);
+int check_tile(struct grid_info *puzzle, int val, int xpos, int ypos);
 
 struct grid_info *init_grid(int szx, int szy);
 

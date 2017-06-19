@@ -1,5 +1,19 @@
 #include "control.h"
 
+int check_tile(struct grid_info *puzzle, int val, int xpos, int ypos)
+{
+	if (xpos >= puzzle->szx)
+		return 1;
+
+	if (ypos >= puzzle->szy)
+		return 2;
+
+	if (puzzle->grid[xpos][ypos] != val)
+		return -1;
+
+	return 0;
+}
+
 /*
  * Function: move_right
  * --------------------

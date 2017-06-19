@@ -1,117 +1,124 @@
 #include "auto_solve.h"
 
-void move_tile_down(struct grid_info *puzzle, int *xsrc, int *ysrc)
+int move_tile_down(struct grid_info *puzzle, int xsrc, int ysrc)
 {
-	if (puzzle->xpos == *xsrc)
+	if (puzzle->xpos == xsrc)
 		if (move_right(puzzle))
 			move_left(puzzle);
 
-	while (puzzle->ypos != (*ysrc)+1) {
-		if (puzzle->ypos < (*ysrc)+1)
+	while (puzzle->ypos != ysrc-1) {
+		if (puzzle->ypos < ysrc-1)
 			move_up(puzzle);
 		else
 			move_down(puzzle);
 	}
 
-	while (puzzle->xpos != (*xsrc)) {
-		if (puzzle->xpos < (*xsrc))
+	while (puzzle->xpos != xsrc) {
+		if (puzzle->xpos < (xsrc))
 			move_left(puzzle);
 		else
 			move_right(puzzle);
 	}
 
 	move_up(puzzle);
-	(*ysrc)++;
+	return 0;
 }
 
-void move_tile_up(struct grid_info *puzzle, int *xsrc, int *ysrc)
+int move_tile_up(struct grid_info *puzzle, int xsrc, int ysrc)
 {
-	if (puzzle->xpos == *xsrc)
+	if (puzzle->xpos == xsrc)
 		if (move_right(puzzle))
 			move_left(puzzle);
 
-	while (puzzle->ypos != (*ysrc)-1) {
-		if (puzzle->ypos < (*ysrc)-1)
+	while (puzzle->ypos != ysrc+1) {
+		if (puzzle->ypos < ysrc+1)
 			move_up(puzzle);
 		else
 			move_down(puzzle);
 	}
 
-	while (puzzle->xpos != (*xsrc)) {
-		if (puzzle->xpos < (*xsrc))
+	while (puzzle->xpos != (xsrc)) {
+		if (puzzle->xpos < (xsrc))
 			move_left(puzzle);
 		else
 			move_right(puzzle);
 	}
 
 	move_down(puzzle);
-	(*ysrc)--;
+	return 0;
 }
 
-void move_tile_right(struct grid_info *puzzle, int *xsrc, int *ysrc)
+int move_tile_right(struct grid_info *puzzle, int xsrc, int ysrc)
 {
-	if (puzzle->ypos == *ysrc)
+	if (puzzle->ypos == ysrc)
 		if (move_down(puzzle))
 			move_up(puzzle);
 
-	while (puzzle->xpos != (*xsrc)+1) {
-		if (puzzle->xpos < (*xsrc)+1)
+	while (puzzle->xpos != (xsrc)-1) {
+		if (puzzle->xpos < (xsrc)-1)
 			move_left(puzzle);
 		else
 			move_right(puzzle);
 	}
 
-	while (puzzle->ypos != (*ysrc)) {
-		if (puzzle->ypos < (*ysrc))
+	while (puzzle->ypos != (ysrc)) {
+		if (puzzle->ypos < (ysrc))
 			move_up(puzzle);
 		else
 			move_down(puzzle);
 	}
 
 	move_left(puzzle);
-	(*xsrc)++;
+	return 0;
 }
 
-void move_tile_left(struct grid_info *puzzle, int *xsrc, int *ysrc)
+int move_tile_left(struct grid_info *puzzle, int xsrc, int ysrc)
 {
-	if (puzzle->ypos == *ysrc)
+	if (puzzle->ypos == ysrc)
 		if (move_down(puzzle))
 			move_up(puzzle);
 
-	while (puzzle->xpos != (*xsrc)-1) {
-		if (puzzle->xpos < (*xsrc)-1)
+	while (puzzle->xpos != xsrc+1) {
+		if (puzzle->xpos < xsrc+1)
 			move_left(puzzle);
 		else
 			move_right(puzzle);
 	}
 
-	while (puzzle->ypos != (*ysrc)) {
-		if (puzzle->ypos < (*ysrc))
+	while (puzzle->ypos != ysrc) {
+		if (puzzle->ypos < ysrc)
 			move_up(puzzle);
 		else
 			move_down(puzzle);
 	}
 
 	move_right(puzzle);
-	(*xsrc)--;
+	return 0;
 }
 
 void move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, int ydst)
 {
 	while (xsrc != xdst) {
-		if (xsrc > xdst)
-			move_tile_right(puzzle, &xsrc, &ysrc);
-		else
-			move_tile_left(puzzle, &xsrc, &ysrc);
+		if (xsrc > xdst) {
+			if (!move_tile_right(puzzle, xsrc, ysrc))
+				xsrc--;
+		}
+		else {
+			if (!move_tile_left(puzzle, xsrc, ysrc))
+				xsrc++;
+		}
 	}
 
 	while (ysrc != ydst) {
-		if (ysrc > ydst)
-			move_tile_down(puzzle, &xsrc, &ysrc);
-		else
-			move_tile_up(puzzle, &xsrc, &ysrc);
+		if (ysrc > ydst) {
+			if (!move_tile_down(puzzle, xsrc, ysrc))
+				ysrc--;
+		}
+		else {
+			if (!move_tile_up(puzzle, xsrc, ysrc))
+				ysrc++;
+		}
 	}
-
 }
 
 /*
@@ -127,8 +134,10 @@ void move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, i
 void auto_solve_3x3(struct grid_info *puzzle)
 {
 	struct search_info *search;
-	int val = 7;
+	int val, a=-1, b=-1, c =-1;
 
+	while(a != 0 || b !=0 || c!= 0) {
+	val = 7;
 	search = init_search(&val, 1);
 	apply_search(puzzle, search);
 	move_tile_src_dst(puzzle, search->x[0], search->y[0], 2, 2);
@@ -143,10 +152,15 @@ void auto_solve_3x3(struct grid_info *puzzle)
 	apply_search(puzzle, search);
 	move_tile_src_dst(puzzle, search->x[0], search->y[0], 2, 1);
 
-	while (!move_right(puzzle)) {}
-	while (!move_up(puzzle)) {}
-	while (!move_left(puzzle)) {}
-	while (!move_down(puzzle)) {}
+	printf("Checking tiles: %d %d %d\n",
+	a = check_tile(puzzle, 7, 2, 2),
+	b = check_tile(puzzle, 6, 1, 2),
+	c = check_tile(puzzle, 8, 2, 1));
+	}
+//	while (!move_right(puzzle)) {}
+//	while (!move_up(puzzle)) {}
+//	while (!move_left(puzzle)) {}
+//	while (!move_down(puzzle)) {}
 }
 
 /*
