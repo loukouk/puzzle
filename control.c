@@ -177,6 +177,8 @@ struct grid_info *init_grid(int szx, int szy)
 	puzzle->szy = szy;
 	puzzle->xpos = 0;
 	puzzle->ypos = 0;
+	puzzle->xprev = -1;
+	puzzle->yprev = -1;
 	puzzle->grid = malloc(szx*sizeof(int *));
 	for (int i = 0; i < szx; i++) {
 		puzzle->grid[i] = malloc(szy*sizeof(int));
