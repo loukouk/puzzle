@@ -9,6 +9,9 @@ TESTS = test_search.c test_control.c
 
 all: puzzle test
 
+run: puzzle
+	./puzzle > out
+
 puzzle: main.c main.h $(SRCS) $(HEADERS)
 	$(CC) $(SRCS) main.c $(CFLAGS) -o $(TARGET)
 
