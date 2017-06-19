@@ -1,33 +1,145 @@
 #include "auto_solve.h"
 
+int move_x_y(struct grid_info *puzzle, int x, int y)
+{
+	if (x > 0)
+		for ( ; x > 0; x--) { 
+			if (move_left(puzzle))
+				return 1;
+	}
+	else
+		for ( ; x < 0; x++) {
+			if (move_right(puzzle))
+				return 1;
+	}
+	
+
+	if (y < 0)
+		for ( ; y < 0; y++) { 
+			if (move_down(puzzle))
+				return 1;
+	}
+	else
+		for ( ; y > 0; y--) { 
+			if (move_up(puzzle))
+				return 1;
+	}
+
+	return 0;
+}
+
 int move_tile_down(struct grid_info *puzzle, int xsrc, int ysrc)
 {
-}
-
-int move_tile_up(struct grid_info *puzzle, int xsrc, int ysrc)
-{
-}
-
-int move_tile_right(struct grid_info *puzzle, int xsrc, int ysrc)
-{
-}
-
-int move_tile_left(struct grid_info *puzzle, int xsrc, int ysrc)
-{
 	int x, y;
+
+	if (ysrc == 0)
+		return 1;
+
 	if (puzzle->xpos == puzzle->szx-1)
 		move_right(puzzle);
 	if (puzzle->ypos == puzzle->szy-1)
 		move_down(puzzle);
 
-	x = xsrc+1 - xpos, y = ysrc - ypos;
+	x = xsrc - puzzle->xpos;
+	y = ysrc-1 - puzzle->ypos;
 
+	if (x == 0 && y < -1) {
+		if (move_right(puzzle)) {
+			move_left(puzzle);
+			x--;
+		}
+		else
+			x++;
+	}
 	
+	move_x_y(puzzle, x, y);
+	move_up(puzzle);
+	return 0;
+}
 
-	if (puzzle->ypos == ysrc)
-		if (move_down(puzzle))
+int move_tile_up(struct grid_info *puzzle, int xsrc, int ysrc)
+{
+	int x, y;
+
+	if (ysrc == puzzle->szy-1)
+		return 1;
+
+	if (puzzle->xpos == puzzle->szx-1)
+		move_right(puzzle);
+	if (puzzle->ypos == puzzle->szy-1)
+		move_down(puzzle);
+
+	x = xsrc - puzzle->xpos;
+	y = ysrc+1 - puzzle->ypos;
+
+	if (x == 0 && y > 1) {
+		if (move_right(puzzle)) {
+			move_left(puzzle);
+			x--;
+		}
+		else
+			x++;
+	}
+
+	move_x_y(puzzle, x, y);
+	move_down(puzzle);
+	return 0;
+}
+
+int move_tile_right(struct grid_info *puzzle, int xsrc, int ysrc)
+{
+	int x, y;
+
+	if (xsrc == 0)
+		return 1;
+
+	if (puzzle->xpos == puzzle->szx-1)
+		move_right(puzzle);
+	if (puzzle->ypos == puzzle->szy-1)
+		move_down(puzzle);
+
+	x = xsrc-1 - puzzle->xpos;
+	y = ysrc - puzzle->ypos;
+
+	if (y == 0 && x < -1) {
+		if (move_down(puzzle)) {
 			move_up(puzzle);
+			y--;
+		}
+		else
+			y++;
+	}
 
+	move_x_y(puzzle, x, y);
+	move_left(puzzle);
+	return 0;
+}
+
+int move_tile_left(struct grid_info *puzzle, int xsrc, int ysrc)
+{
+	int x, y;
+
+	if (xsrc == puzzle->szx-1)
+		return 1;
+
+	if (puzzle->xpos == puzzle->szx-1)
+		move_right(puzzle);
+	if (puzzle->ypos == puzzle->szy-1)
+		move_down(puzzle);
+
+	x = xsrc+1 - puzzle->xpos;
+	y = ysrc - puzzle->ypos;
+
+	if (y == 0 && x > 1) {
+		if (move_down(puzzle)) {
+			move_up(puzzle);
+			y--;
+		}
+		else
+			y++;
+	}
+
+	move_x_y(puzzle, x, y);
 	move_right(puzzle);
 	return 0;
 }
@@ -44,7 +156,7 @@ void move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, i
 		for ( ; x < 0; x++) { move_tile_right(puzzle, xsrc, ysrc); }
 		if (y < 0)
 			for ( ; y < 0; y++) { move_tile_down(puzzle, xsrc, ysrc); }
-		if (y > 0)
+		else
 			for ( ; y > 0; y--) { move_tile_up(puzzle, xsrc, ysrc); }
 	}
 	else {
