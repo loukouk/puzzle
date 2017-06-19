@@ -1,5 +1,5 @@
 #include "main.h"
-extern char *optarg;
+
 /*
  * Function: usage
  * ---------------
@@ -66,41 +66,6 @@ void user_solve(struct grid_info *puzzle)
 
 
 /*
- * Function: auto_solve_3x3
- * ------------------------
- *
- * AI that will solve the puzzle by itself.
- * This function is only meant to solve 3x3 puzzles.
- * It is a stepping stone to implementing auto_solve().
- *
- * puzzle: Pointer to structure containing puzzle to be solved.
- */
-void auto_solve_3x3(struct grid_info *puzzle)
-{
-	
-}
-
-/*
- * Function: auto_solve
- * --------------------
- *
- * Will eventually solve any puzzle that is passed in to the function
- * reguardless of the size of the grid. Ideally, this will also work
- * with non-square grids. For now, it only calls auto_solve_3x3().
- *
- * puzzle: Pointer to structure containing puzzle to be solved.
- */
-void auto_solve(struct grid_info *puzzle)
-{
-	if (puzzle->sz > 3) {
-		printf("AI solve for grid greater than 3x3 not yet supported\n");
-		exit(EXIT_FAILURE);
-	}
-
-	auto_solve_3x3(puzzle);
-}
-
-/*
  * Function: main
  * --------------
  *
@@ -116,7 +81,7 @@ void auto_solve(struct grid_info *puzzle)
  */
 int main(int argc, char ** argv)
 {
-	int sz = 3, player = 0, szx = 3, szy = 3;
+	int player = 0, szx = 3, szy = 3;
 	struct grid_info *puzzle;
 	char c;
 
@@ -146,9 +111,10 @@ int main(int argc, char ** argv)
 
 	srand(time(NULL));
 
-	puzzle = init_grid(sz);
-	scramble_grid(puzzle, 5);
-//	print_grid(puzzle);
+	puzzle = init_grid(szx, szy);
+	scramble_grid(puzzle, 1000);
+	print_grid(puzzle);
+	printf("\nScramble Done\n");
 
 	if (player)
 		user_solve(puzzle);

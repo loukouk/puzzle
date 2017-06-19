@@ -4,9 +4,9 @@
 
 int main() {
 
-	int sz = 5, srch=6;
+	int  srch=6;
 	struct grid_info *puzzle;
-	puzzle = init_grid(sz);
+	puzzle = init_grid( 8, 4);
 
 	print_grid(puzzle);
 

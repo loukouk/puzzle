@@ -2,15 +2,14 @@
 #define PUZZLE_MAIN_H
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
-#include "control.h"
-#include "search.h"
+#include <time.h>
+#include "auto_solve.h"
 
 void usage();
 void user_solve(struct grid_info *puzzle);
 void auto_solve_3x3(struct grid_info *puzzle);
 void auto_solve(struct grid_info *puzzle);
 
+extern char *optarg;
 #endif

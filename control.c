@@ -17,13 +17,16 @@ int move_right(struct grid_info *puzzle)
 	int x = puzzle->xpos;
 	int y = puzzle->ypos;
 
-	if (x == puzzle->sz-1) {
+	if (x == 0) {
 		return 1;
 	}
 
-	puzzle->grid[x][y] = puzzle->grid[x+1][y];
-	puzzle->grid[x+1][y] = 0;
-	puzzle->xpos++;
+	puzzle->grid[x][y] = puzzle->grid[x-1][y];
+	puzzle->grid[x-1][y] = 0;
+	puzzle->xpos--;
+
+	if (STEP_BY_STEP_PRINT)
+		print_grid(puzzle);
 
 	return 0;	
 }
@@ -45,13 +48,16 @@ int move_left(struct grid_info *puzzle)
 	int x = puzzle->xpos;
 	int y = puzzle->ypos;
 
-	if (x == 0) {
+	if (x == puzzle->szx-1) {
 		return 1;
 	}
 
-	puzzle->grid[x][y] = puzzle->grid[x-1][y];
-	puzzle->grid[x-1][y] = 0;
-	puzzle->xpos--;
+	puzzle->grid[x][y] = puzzle->grid[x+1][y];
+	puzzle->grid[x+1][y] = 0;
+	puzzle->xpos++;
+
+	if (STEP_BY_STEP_PRINT)
+		print_grid(puzzle);
 
 	return 0;	
 }
@@ -73,13 +79,16 @@ int move_down(struct grid_info *puzzle)
 	int x = puzzle->xpos;
 	int y = puzzle->ypos;
 
-	if (y == puzzle->sz-1) {
+	if (y == 0) {
 		return 1;
 	}
 
-	puzzle->grid[x][y] = puzzle->grid[x][y+1];
-	puzzle->grid[x][y+1] = 0;
-	puzzle->ypos++;
+	puzzle->grid[x][y] = puzzle->grid[x][y-1];
+	puzzle->grid[x][y-1] = 0;
+	puzzle->ypos--;
+
+	if (STEP_BY_STEP_PRINT)
+		print_grid(puzzle);
 
 	return 0;	
 }
@@ -101,13 +110,16 @@ int move_up(struct grid_info *puzzle)
 	int x = puzzle->xpos;
 	int y = puzzle->ypos;
 
-	if (y == 0) {
+	if (y == puzzle->szy-1) {
 		return 1;
 	}
 
-	puzzle->grid[x][y] = puzzle->grid[x][y-1];
-	puzzle->grid[x][y-1] = 0;
-	puzzle->ypos--;
+	puzzle->grid[x][y] = puzzle->grid[x][y+1];
+	puzzle->grid[x][y+1] = 0;
+	puzzle->ypos++;
+
+	if (STEP_BY_STEP_PRINT)
+		print_grid(puzzle);
 
 	return 0;	
 }
@@ -122,8 +134,8 @@ int move_up(struct grid_info *puzzle)
  */
 void print_grid(struct grid_info *puzzle)
 {
-	for (int j = 0; j < puzzle->sz; j++) {
-		for (int i = 0; i < puzzle->sz; i++) {
+	for (int j = puzzle->szy-1; j >= 0; j--) {
+		for (int i = puzzle->szx-1; i >= 0; i--) {
 			printf("%d\t", puzzle->grid[i][j]);
 		}
 		printf("\n");
@@ -143,18 +155,19 @@ void print_grid(struct grid_info *puzzle)
  *
  * returns a pointer to the initialized structure
  */
-struct grid_info *init_grid(int sz)
+struct grid_info *init_grid(int szx, int szy)
 {
 	struct grid_info *puzzle = malloc(sizeof(struct grid_info));
 
-	puzzle->sz = sz;
-	puzzle->xpos = sz-1;
-	puzzle->ypos = sz-1;
-	puzzle->grid = malloc(sz*sizeof(int *));
-	for (int i = 0; i < sz; i++) {
-		puzzle->grid[i] = malloc(sz*sizeof(int));
-		for (int j = 0; j < sz; j++)
-			puzzle->grid[i][j] = (sz-i-1) + (sz-1-j)*sz;
+	puzzle->szx = szx;
+	puzzle->szy = szy;
+	puzzle->xpos = 0;
+	puzzle->ypos = 0;
+	puzzle->grid = malloc(szx*sizeof(int *));
+	for (int i = 0; i < szx; i++) {
+		puzzle->grid[i] = malloc(szy*sizeof(int));
+		for (int j = 0; j < szy; j++)
+			puzzle->grid[i][j] = i + j*szx;
 	}
 
 	return puzzle;
@@ -197,11 +210,12 @@ void scramble_grid(struct grid_info *puzzle, int num)
  */
 int is_win(struct grid_info *puzzle)
 {
-	int sz = puzzle->sz;
+	int szx = puzzle->szx;
+	int szy = puzzle->szy;
 	
-	for (int i = 0; i < sz; i++) {
-		for (int j = 0; j < sz; j++)
-			if (puzzle->grid[i][j] != (sz-i-1) + (sz-1-j)*sz)
+	for (int i = 0; i < szx; i++) {
+		for (int j = 0; j < szy; j++)
+			if (puzzle->grid[i][j] != i + j*szx)
 				return 0;
 	}
 	return 1;

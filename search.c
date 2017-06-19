@@ -62,8 +62,8 @@ int apply_search(struct grid_info *puzzle, struct search_info *search)
 		search->y[i] = -1;
 	}
 
-	for (int i = 0; i < puzzle->sz; i++) {
-		for (int j = 0; j < puzzle->sz; j++) {
+	for (int i = 0; i < puzzle->szx; i++) {
+		for (int j = 0; j < puzzle->szy; j++) {
 			for (int k = 0; k < search->sz; k++) {
 				if (puzzle->grid[i][j] == search->vals[k]) {
 					search->x[k] = i;

@@ -1,13 +1,13 @@
-TARGET = puzzle
-SRCS = control.c search.c
-HEADERS = control.h search.h
-CFLAGS = -g -Wall -O2 -pedantic-errors -std=gnu99
 CC = gcc
+CFLAGS = -g -Wall -O2 -pedantic-errors -std=gnu99
+TARGET = puzzle
+SRCS = control.c search.c auto_solve.c
+HEADERS = control.h search.h auto_solve.h
 TESTS = test_search.c test_control.c
 
 
 
-all: puzzle
+all: puzzle test
 
 puzzle: main.c main.h $(SRCS) $(HEADERS)
 	$(CC) $(SRCS) main.c $(CFLAGS) -o $(TARGET)
