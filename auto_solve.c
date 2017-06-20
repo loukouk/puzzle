@@ -1,5 +1,22 @@
 #include "auto_solve.h"
 
+/*
+ * Function: move_x_y
+ * ------------------
+ * 
+ * Moves the hole first in the x direction for a number
+ * of moves and the in the y direction for a number of moves.
+ * The x and y values determine how many moves are to be done
+ * and which direction they are in.
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ * x: number of moves to be made in x direction.
+ *    + is left direction, - is right
+ * y: number of moves to be made in y direction.
+ *    + is up, - is down
+ *
+ * returns 1 if any moves fail, and 0 success
+ */
 int move_x_y(struct grid_info *puzzle, int x, int y)
 {
 	printf("Entering move_x_y: x=%d y=%d\n", x, y);
@@ -29,6 +46,23 @@ int move_x_y(struct grid_info *puzzle, int x, int y)
 	return 0;
 }
 
+/*
+ * Function: move_y_x
+ * ------------------
+ * 
+ * Moves the hole first in the y direction for a number
+ * of moves and the in the x direction for a number of moves.
+ * The y and x values determine how many moves are to be done
+ * and which direction they are in.
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ * y: number of moves to be made in y direction.
+ *    + is up, - is down
+ * x: number of moves to be made in x direction.
+ *    + is left direction, - is right
+ *
+ * returns 1 if any moves fail, and 0 on success
+ */
 int move_y_x(struct grid_info *puzzle, int y, int x)
 {
 	printf("Entering move_y_x: y=%d x=%d\n", y, x);
@@ -58,6 +92,20 @@ int move_y_x(struct grid_info *puzzle, int y, int x)
 	return 0;
 }
 
+/*
+ * Function: move_tile_down
+ * ------------------------
+ *
+ * "Moves" a tile down. This is achieved by moving the
+ * hole below the tile using a series of moves, and
+ * the calling the move_up() function.
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ * xsrc: original x position of the tile to be moved
+ * ysrc: original x postiion of the tile to be moved
+ *
+ * returns 1 if the tile cannot be moved, 0 on success
+ */
 int move_tile_down(struct grid_info *puzzle, int xsrc, int ysrc)
 {
 	int x, y;
@@ -92,6 +140,20 @@ int move_tile_down(struct grid_info *puzzle, int xsrc, int ysrc)
 	return 0;
 }
 
+/*
+ * Function: move_tile_up
+ * ----------------------
+ *
+ * "Moves" a tile up. This is achieved by moving the
+ * hole above the tile using a series of moves, and
+ * the calling the move_down() function.
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ * xsrc: original x position of the tile to be moved
+ * ysrc: original x postiion of the tile to be moved
+ *
+ * returns 1 if the tile cannot be moved, 0 on success
+ */
 int move_tile_up(struct grid_info *puzzle, int xsrc, int ysrc)
 {
 	int x, y;
@@ -126,6 +188,20 @@ int move_tile_up(struct grid_info *puzzle, int xsrc, int ysrc)
 	return 0;
 } 
 
+/*
+ * Function: move_tile_right
+ * -------------------------
+ *
+ * "Moves" a tile to the right. This is achieved by moving the
+ * hole to the right of the tile using a series of moves, and
+ * the calling the move_left() function.
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ * xsrc: original x position of the tile to be moved
+ * ysrc: original x postiion of the tile to be moved
+ *
+ * returns 1 if the tile cannot be moved, 0 on success
+ */
 int move_tile_right(struct grid_info *puzzle, int xsrc, int ysrc)
 {
 	int x, y;
@@ -160,6 +236,20 @@ int move_tile_right(struct grid_info *puzzle, int xsrc, int ysrc)
 	return 0;
 }
 
+/*
+ * Function: move_tile_left
+ * ------------------------
+ *
+ * "Moves" a tile to the left. This is achieved by moving the
+ * hole to the left of the tile using a series of moves, and
+ * the calling the move_right() function.
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ * xsrc: original x position of the tile to be moved
+ * ysrc: original x postiion of the tile to be moved
+ *
+ * returns 1 if the tile cannot be moved, 0 on success
+ */
 int move_tile_left(struct grid_info *puzzle, int xsrc, int ysrc)
 {
 	int x, y;
@@ -179,11 +269,6 @@ int move_tile_left(struct grid_info *puzzle, int xsrc, int ysrc)
 			y++;
 	}
 
-
-//	if (puzzle->yprev == puzzle->ypos && (puzzle->xprev)-(puzzle->xpos) <= x)
-//	if (puzzle->xprev == xsrc && (puzzle->yprev)-ysrc <= y)
-
-
 	if (y > 1) {
 		move_x_y(puzzle, 0, y-1);
 		move_x_y(puzzle, x, 1);
@@ -199,9 +284,34 @@ int move_tile_left(struct grid_info *puzzle, int xsrc, int ysrc)
 	return 0;
 }
 
-void move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, int ydst)
+/*
+ * Function: move_tile_src_dst
+ * ---------------------------
+ * 
+ * This function is an abstraction. It takes the tile at
+ * location (xsrc, ysrc) and "moves" it to location (xdst, ydst).
+ * In reality, it takes many moves to achieve that result.
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ * xsrc: original x position of tile to be moved
+ * ysrc: original y position of tile to be moved
+ * xdst: destination x postion of the tile
+ * ydst: destination y postion of the tile
+ *
+ * returns 1 if the coordinates are out of bounds, 0 on success
+ */
+int move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, int ydst)
 {
 	int x = xdst-xsrc, y = ydst-ysrc;
+
+	if (xsrc > puzzle->szx-1 || xsrc < 0)
+		return 1;
+	if (xdst > puzzle->szx-1 || xdst < 0)
+		return 1;
+	if (ysrc > puzzle->szy-1 || ysrc < 0)
+		return 1;
+	if (ydst > puzzle->szy-1 || ydst < 0)
+		return 1;
 
 	if (y < 0 && x > 0) {
 		for ( ; y < 0; y++) { 
@@ -242,9 +352,25 @@ void move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, i
 		
 	puzzle->xprev = xdst;
 	puzzle->yprev = ydst;
-	return;
+	return 0;
 }
 
+/*
+ * Function: fix_algorithm
+ * -----------------------
+ *
+ * This function fixes the following board state automoatically
+ * 		8	6	7
+ * 		x	x	0
+ * 		x	x	x
+ * such that the top three numbers are in descending order.
+ * This is useful because the method I coded cannot handle
+ * this particular case.
+ *
+ * puzzle: Pointer to structure containing puzzle to modify.
+ *
+ * returns 1 if any moves fail, 0 on success
+ */
 int fix_algorithm(struct grid_info *puzzle)
 {
 	int ret = 0;
@@ -278,22 +404,11 @@ int fix_algorithm(struct grid_info *puzzle)
 }
 
 
-/*
- * Function: auto_solve_3x3
- * ------------------------
- *
- * AI that will solve the puzzle by itself.
- * This function is only meant to solve 3x3 puzzles.
- * It is a stepping stone to implementing auto_solve().
- *
- * puzzle: Pointer to structure containing puzzle to be solved.
- */
-void auto_solve_3x3(struct grid_info *puzzle)
+int solve_top_row(struct grid_info *puzzle)
 {
 	struct search_info *search;
 	int val, a=-1, b=-1, c =-1;
 
-//	while(a != 0 || b !=0 || c!= 0) {
 	val = 8;
 	search = init_search(&val, 1);
 	apply_search(puzzle, search);
@@ -308,14 +423,13 @@ void auto_solve_3x3(struct grid_info *puzzle)
 
 	printf("Done 7\n");
 
-	val = 6;
-	search = init_search(&val, 1);
-	apply_search(puzzle, search);
-
 	printf("Checking pos (1,2)\n");
 	if (puzzle->xpos == 1 && puzzle->ypos == 2)
 		move_down(puzzle);
 
+	val = 6;
+	search = init_search(&val, 1);
+	apply_search(puzzle, search);
 	printf("Checking for alg req\n");
 
 	if (search->x[0] == 1 && search->y[0] == 2)
@@ -334,12 +448,68 @@ void auto_solve_3x3(struct grid_info *puzzle)
 	a = check_tile(puzzle, 8, 2, 2),
 	b = check_tile(puzzle, 7, 1, 2),
 	c = check_tile(puzzle, 6, 0, 2));
-//	}
-//	while (!move_right(puzzle)) {}
-//	while (!move_up(puzzle)) {}
-//	while (!move_left(puzzle)) {}
-//	while (!move_down(puzzle)) {}
 
+	if (!a && !b && !c)
+		return 0;
+	else
+		return 1;
+
+}
+
+int solve_final(struct grid_info *puzzle)
+{
+	if (puzzle->szy != 2 || puzzle->szx != 2)
+		return 1;
+
+	int cnt = 0;
+
+	move_x_y(puzzle, 0-(puzzle->xpos), 0-(puzzle->ypos));
+
+	while (!is_win(puzzle)) {
+		move_up(puzzle);
+		move_left(puzzle);
+		move_down(puzzle);
+		move_right(puzzle);
+		cnt++;
+		if (cnt >= 4)
+			return 1;
+	}
+	return 0;
+}
+
+int solve_left_col(struct grid_info *puzzle)
+{
+	struct search_info *search;
+	int vals[2] = {5, 2};
+
+	search = init_search(vals, 2);
+	apply_search(puzzle, search);
+
+	move_tile_src_dst(puzzle, search->x[1], search->y[1], 2, 1);
+	printf("Done 5\n");
+
+
+	if (puzzle->xpos == 2 && puzzle->ypos == 0)
+		move_right(puzzle);
+
+	apply_search(puzzle, search);
+
+	if (search->x[0] == 2 && search->y[0] == 0)
+		printf("second alg\n");
+	else {
+		move_tile_src_dst(puzzle, search->x[0], search->y[0], 1, 1);
+
+		printf("Done 2\n");
+
+		move_y_x(puzzle, 2-(puzzle->xpos), 0-(puzzle->ypos));
+		move_up(puzzle);
+		move_right(puzzle);
+	}
+
+	if (check_tile(puzzle, 5, 2, 1) || check_tile(puzzle, 2, 2, 0))
+		return 1;
+
+	return 0;
 }
 
 /*
@@ -348,20 +518,42 @@ void auto_solve_3x3(struct grid_info *puzzle)
  *
  * Will eventually solve any puzzle that is passed in to the function
  * reguardless of the size of the grid. Ideally, this will also work
- * with non-square grids. For now, it only calls auto_solve_3x3().
+ * with non-square grids.
  *
  * puzzle: Pointer to structure containing puzzle to be solved.
+ *
+ * returns 0 if solved and 1 if the program failed to solve the puzzle
  */
-void auto_solve(struct grid_info *puzzle)
+int auto_solve(struct grid_info *puzzle)
 {
 	if (puzzle->szx != 3 || puzzle->szy != 3) {
 		printf("AI solve for grid different than 3x3 not yet supported\n");
 		exit(EXIT_FAILURE);
 	}
 
-	auto_solve_3x3(puzzle);
-}
+	int szx, szy, ret;
+	szx = puzzle->szx;
+	szy = puzzle->szy;
 
+	while (puzzle->szy > 2) {
+		if (solve_top_row(puzzle))
+			return 1;
+
+		puzzle->szy--;
+	}
+
+	while (puzzle->szx > 3) {
+		if (solve_left_col(puzzle))
+			return 1;
+
+		puzzle->szx--;
+	}
+
+	ret = solve_final(puzzle);
+	puzzle->szx = szx;
+	puzzle->szy = szy;
+	return ret;
+}
 
 // OLD
 /*

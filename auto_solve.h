@@ -4,7 +4,6 @@
 #include "control.h"
 #include "search.h"
 
-void auto_solve_3x3(struct grid_info *puzzle);
-void auto_solve(struct grid_info *puzzle);
+int auto_solve(struct grid_info *puzzle);
 
 #endif

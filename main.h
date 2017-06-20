@@ -8,8 +8,6 @@
 
 void usage();
 void user_solve(struct grid_info *puzzle);
-void auto_solve_3x3(struct grid_info *puzzle);
-void auto_solve(struct grid_info *puzzle);
 
 extern char *optarg;
 #endif
