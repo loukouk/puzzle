@@ -1,3 +1,6 @@
 puzzle
+test_control
+test_search
+test_auto
 *.o
 *.c.swp
