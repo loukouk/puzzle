@@ -360,13 +360,12 @@ int move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, in
 
 /*
  * Function: fix_algorithm1
- * -----------------------
+ * ------------------------
  *
  * This function fixes the following board state automoatically
  * 		(2,2)	(0,2)	(1,2)
  * 		x	x	0
  * 		x	x	x
- * such that the top three numbers are in descending order.
  * This is useful because the method I coded cannot handle
  * this particular case.
  *
@@ -408,6 +407,22 @@ int fix_algorithm1(struct grid_info *puzzle)
 	return ret;
 }
 
+/*
+ * Function: fix_algorithm2
+ * ------------------------
+ *
+ * This function fixes the following board state automoatically
+ * 		o	o	o
+ * 		(2,0)	0	x
+ * 		(2,1)	x	x
+ * such that the two bottom left tiles are flipped back into
+ * their correct positions without disturbing the top row.
+ * This method will always handle this particular case.
+ *
+ * puzzle: Pointer to structure containing puzzle to modify.
+ *
+ * returns 1 if any moves fail, 0 on success
+ */
 int fix_algorithm2(struct grid_info *puzzle)
 {
 	int ret = 0;
@@ -442,6 +457,17 @@ int fix_algorithm2(struct grid_info *puzzle)
 	return ret;
 }
 
+/*
+ * Function: solve_top_row
+ * -----------------------
+ *
+ * This method solves the top row of the puzzle.
+ *
+ * puzzle: Pointer to structure containing puzzle to modify.
+ *
+ * returns 0 on success (checks the result)
+ * returns 1 when the check failed
+ */
 int solve_top_row(struct grid_info *puzzle)
 {
 	struct search_info *search;
@@ -508,6 +534,21 @@ int solve_top_row(struct grid_info *puzzle)
 
 }
 
+/*
+ * Function: solve_left_col
+ * ------------------------
+ *
+ * This method solves the left column of the puzzle.
+ * It is designed to solve it when there are only
+ * two rows left. First reduce the puzzle using
+ * the solve_top_row function. Execution not 
+ * guaranteed if there are more than 2 rows left.
+ *
+ * puzzle: Pointer to structure containing puzzle to modify.
+ *
+ * returns 0 on success (checks the result)
+ * returns 1 when the check failed
+ */
 int solve_left_col(struct grid_info *puzzle)
 {
 	struct search_info *search;
@@ -553,6 +594,18 @@ int solve_left_col(struct grid_info *puzzle)
 	return 0;
 }
 
+/*
+ * Function: solve_final
+ * ---------------------
+ *
+ * This method solves the remaining four tiles of a
+ * puzzle. Designed for finishing a 2x2 reduced puzzle.
+ *
+ * puzzle: Pointer to structure containing puzzle to modify.
+ *
+ * returns 0 on success (the puzzle is solved)
+ * returns 1 when unable to solve the puzzle
+ */
 int solve_final(struct grid_info *puzzle)
 {
 	if (puzzle->szy != 2 || puzzle->szx != 2)

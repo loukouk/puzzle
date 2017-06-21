@@ -7,6 +7,7 @@
 #include "auto_solve.h"
 
 void usage();
+void print_help();
 void user_solve(struct grid_info *puzzle);
 
 extern char *optarg;

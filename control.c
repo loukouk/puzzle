@@ -1,5 +1,18 @@
 #include "control.h"
 
+/*
+ * Function: check_tile
+ * --------------------
+ * 
+ * This function checks if a tile is in its proper
+ * position for a solved puzzle
+ *
+ * puzzle: The structure that holds the tiles to be moved
+ *
+ * returns 1 if the x-y coordinates are out of bounds
+ * returns -1 if the value of the tiles is incorrect
+ * returns 0 on match
+ */
 int check_tile(struct grid_info *puzzle, int x, int y)
 {
 	if (x > puzzle->szx-1 || x < 0)
