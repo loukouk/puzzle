@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall -O2 -pedantic-errors -std=gnu99
+CFLAGS = -g -Wall -pedantic-errors -std=gnu99
 TARGET = puzzle
 SRCS = control.c search.c auto_solve.c
 HEADERS = control.h search.h auto_solve.h
@@ -31,4 +31,4 @@ debugtest: $(TESTS) $(SRCS) $(HEADERS)
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET) *.o test_search test_control test_auto
+	rm -f $(TARGET) *.o test_search test_control test_auto out *.out

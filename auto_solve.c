@@ -19,7 +19,10 @@
  */
 int move_x_y(struct grid_info *puzzle, int x, int y)
 {
+	#if PUZZLE_PRINT_DEBUG==1
 	printf("Entering move_x_y: x=%d y=%d\n", x, y);
+	#endif
+
 	if (x > 0)
 		for ( ; x > 0; x--) { 
 			if (move_left(puzzle))
@@ -65,7 +68,9 @@ int move_x_y(struct grid_info *puzzle, int x, int y)
  */
 int move_y_x(struct grid_info *puzzle, int y, int x)
 {
+	#if PUZZLE_PRINT_DEBUG == 1
 	printf("Entering move_y_x: y=%d x=%d\n", y, x);
+	#endif
 
 	if (y < 0)
 		for ( ; y < 0; y++) { 
@@ -350,17 +355,15 @@ int move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, in
 		}
 	}	
 		
-	puzzle->xprev = xdst;
-	puzzle->yprev = ydst;
 	return 0;
 }
 
 /*
- * Function: fix_algorithm
+ * Function: fix_algorithm1
  * -----------------------
  *
  * This function fixes the following board state automoatically
- * 		8	6	7
+ * 		(2,2)	(0,2)	(1,2)
  * 		x	x	0
  * 		x	x	x
  * such that the top three numbers are in descending order.
@@ -371,10 +374,12 @@ int move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, in
  *
  * returns 1 if any moves fail, 0 on success
  */
-int fix_algorithm(struct grid_info *puzzle)
+int fix_algorithm1(struct grid_info *puzzle)
 {
 	int ret = 0;
-	printf("fix alg\n");
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("fix alg1\n");
+	#endif
 
 	move_x_y(puzzle, 0-(puzzle->xpos), 1-(puzzle->ypos));
 
@@ -403,57 +408,149 @@ int fix_algorithm(struct grid_info *puzzle)
 	return ret;
 }
 
+int fix_algorithm2(struct grid_info *puzzle)
+{
+	int ret = 0;
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("fix alg2\n");
+	#endif
+
+	move_x_y(puzzle, 1-(puzzle->xpos), 1-(puzzle->ypos));
+
+	ret |= move_left(puzzle);
+	ret |= move_down(puzzle);
+	ret |= move_right(puzzle);
+	ret |= move_up(puzzle);
+	ret |= move_right(puzzle);
+	ret |= move_down(puzzle);
+	ret |= move_left(puzzle);
+	ret |= move_up(puzzle);
+	ret |= move_left(puzzle);
+	ret |= move_down(puzzle);
+	ret |= move_right(puzzle);
+	ret |= move_up(puzzle);
+	ret |= move_left(puzzle);
+	ret |= move_down(puzzle);
+	ret |= move_right(puzzle);
+	ret |= move_right(puzzle);
+	ret |= move_up(puzzle);
+	ret |= move_left(puzzle);
+	ret |= move_left(puzzle);
+	ret |= move_down(puzzle);
+	ret |= move_right(puzzle);
+
+	return ret;
+}
 
 int solve_top_row(struct grid_info *puzzle)
 {
 	struct search_info *search;
-	int val, a=-1, b=-1, c =-1;
+	struct tile val[1];
+	int a=-1, b=-1, c =-1;
 
-	val = 8;
-	search = init_search(&val, 1);
+	val->x = 2;
+	val->y = 2;
+	search = init_search(val, 1);
 	apply_search(puzzle, search);
-	move_tile_src_dst(puzzle, search->x[0], search->y[0], 2, 2);
+	move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 2, 2);
 
+	#if PUZZLE_PRINT_DEBUG == 1
 	printf("Done 8\n");
+	#endif
 
-	val = 7;
-	search = init_search(&val, 1);
+	val->x = 1;
+	val->y = 2;
+	search = init_search(val, 1);
 	apply_search(puzzle, search);
-	move_tile_src_dst(puzzle, search->x[0], search->y[0], 0, 2);
+	move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 0, 2);
 
-	printf("Done 7\n");
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("Done 7\nChecking pos (1,2)\n");
+	#endif
 
-	printf("Checking pos (1,2)\n");
 	if (puzzle->xpos == 1 && puzzle->ypos == 2)
 		move_down(puzzle);
 
-	val = 6;
-	search = init_search(&val, 1);
+	val->x = 0;
+	val->y = 2;
+	search = init_search(val, 1);
 	apply_search(puzzle, search);
+	#if PUZZLE_PRINT_DEBUG == 1
 	printf("Checking for alg req\n");
+	#endif
 
-	if (search->x[0] == 1 && search->y[0] == 2)
-		fix_algorithm(puzzle);
+	if (search->pos[0].x == 1 && search->pos[0].y == 2)
+		fix_algorithm1(puzzle);
 	else {
-		move_tile_src_dst(puzzle, search->x[0], search->y[0], 0, 1);
+		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 0, 1);
 
+		#if PUZZLE_PRINT_DEBUG == 1
 		printf("Done 6\n");
+		#endif
 
 		move_x_y(puzzle, 1-(puzzle->xpos), 2-(puzzle->ypos));
 		move_right(puzzle);
 		move_down(puzzle);
 	}
 
-	printf("Checking tiles: %d %d %d\n",
-	a = check_tile(puzzle, 8, 2, 2),
-	b = check_tile(puzzle, 7, 1, 2),
-	c = check_tile(puzzle, 6, 0, 2));
+	a = check_tile(puzzle, 2, 2);
+	b = check_tile(puzzle, 1, 2);
+	c = check_tile(puzzle, 0, 2);
+
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("Checking tiles: %d %d %d\n", a, b, c);
+	#endif
 
 	if (!a && !b && !c)
 		return 0;
 	else
 		return 1;
 
+}
+
+int solve_left_col(struct grid_info *puzzle)
+{
+	struct search_info *search;
+	struct tile vals[2];
+
+	vals[0].x = 2;
+	vals[1].x = 2;
+	vals[0].y = 1;
+	vals[1].y = 0;
+	search = init_search(vals, 2);
+	apply_search(puzzle, search);
+
+	move_tile_src_dst(puzzle, search->pos[1].x, search->pos[1].y, 2, 1);
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("Done 2\n");
+	#endif
+
+	if (puzzle->xpos == 2 && puzzle->ypos == 0)
+		move_right(puzzle);
+
+	apply_search(puzzle, search);
+
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("Checking for fix alg2\n");
+	#endif
+
+	if (search->pos[0].x == 2 && search->pos[0].y == 0)
+		fix_algorithm2(puzzle);
+	else {
+		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 1, 1);
+
+		#if PUZZLE_PRINT_DEBUG == 1
+		printf("Done 5\n");
+		#endif
+
+		move_y_x(puzzle, 0-(puzzle->ypos), 2-(puzzle->xpos));
+		move_up(puzzle);
+		move_right(puzzle);
+	}
+	if (check_tile(puzzle, 2, 1) || check_tile(puzzle, 2, 0))
+		return 1;
+
+	return 0;
 }
 
 int solve_final(struct grid_info *puzzle)
@@ -474,41 +571,6 @@ int solve_final(struct grid_info *puzzle)
 		if (cnt >= 4)
 			return 1;
 	}
-	return 0;
-}
-
-int solve_left_col(struct grid_info *puzzle)
-{
-	struct search_info *search;
-	int vals[2] = {5, 2};
-
-	search = init_search(vals, 2);
-	apply_search(puzzle, search);
-
-	move_tile_src_dst(puzzle, search->x[1], search->y[1], 2, 1);
-	printf("Done 5\n");
-
-
-	if (puzzle->xpos == 2 && puzzle->ypos == 0)
-		move_right(puzzle);
-
-	apply_search(puzzle, search);
-
-	if (search->x[0] == 2 && search->y[0] == 0)
-		printf("second alg\n");
-	else {
-		move_tile_src_dst(puzzle, search->x[0], search->y[0], 1, 1);
-
-		printf("Done 2\n");
-
-		move_y_x(puzzle, 2-(puzzle->xpos), 0-(puzzle->ypos));
-		move_up(puzzle);
-		move_right(puzzle);
-	}
-
-	if (check_tile(puzzle, 5, 2, 1) || check_tile(puzzle, 2, 2, 0))
-		return 1;
-
 	return 0;
 }
 
@@ -542,7 +604,7 @@ int auto_solve(struct grid_info *puzzle)
 		puzzle->szy--;
 	}
 
-	while (puzzle->szx > 3) {
+	while (puzzle->szx > 2) {
 		if (solve_left_col(puzzle))
 			return 1;
 
@@ -554,129 +616,3 @@ int auto_solve(struct grid_info *puzzle)
 	puzzle->szy = szy;
 	return ret;
 }
-
-// OLD
-/*
-int move_tile_down(struct grid_info *puzzle, int xsrc, int ysrc)
-{
-	
-
-	if (puzzle->xpos == xsrc)
-		if (move_right(puzzle))
-			move_left(puzzle);
-
-	while (puzzle->ypos != ysrc-1) {
-		if (puzzle->ypos < ysrc-1)
-			move_up(puzzle);
-		else
-			move_down(puzzle);
-	}
-
-	while (puzzle->xpos != xsrc) {
-		if (puzzle->xpos < (xsrc))
-			move_left(puzzle);
-		else
-			move_right(puzzle);
-	}
-
-	move_up(puzzle);
-	return 0;
-}
-
-int move_tile_up(struct grid_info *puzzle, int xsrc, int ysrc)
-{
-	if (puzzle->xpos == xsrc)
-		if (move_right(puzzle))
-			move_left(puzzle);
-
-	while (puzzle->ypos != ysrc+1) {
-		if (puzzle->ypos < ysrc+1)
-			move_up(puzzle);
-		else
-			move_down(puzzle);
-	}
-
-	while (puzzle->xpos != (xsrc)) {
-		if (puzzle->xpos < (xsrc))
-			move_left(puzzle);
-		else
-			move_right(puzzle);
-	}
-
-	move_down(puzzle);
-	return 0;
-}
-
-int move_tile_right(struct grid_info *puzzle, int xsrc, int ysrc)
-{
-	if (puzzle->ypos == ysrc)
-		if (move_down(puzzle))
-			move_up(puzzle);
-
-	while (puzzle->xpos != (xsrc)-1) {
-		if (puzzle->xpos < (xsrc)-1)
-			move_left(puzzle);
-		else
-			move_right(puzzle);
-	}
-
-	while (puzzle->ypos != (ysrc)) {
-		if (puzzle->ypos < (ysrc))
-			move_up(puzzle);
-		else
-			move_down(puzzle);
-	}
-
-	move_left(puzzle);
-	return 0;
-}
-
-int move_tile_left(struct grid_info *puzzle, int xsrc, int ysrc)
-{
-	if (puzzle->ypos == ysrc)
-		if (move_down(puzzle))
-			move_up(puzzle);
-
-	while (puzzle->xpos != xsrc+1) {
-		if (puzzle->xpos < xsrc+1)
-			move_left(puzzle);
-		else
-			move_right(puzzle);
-	}
-
-	while (puzzle->ypos != ysrc) {
-		if (puzzle->ypos < ysrc)
-			move_up(puzzle);
-		else
-			move_down(puzzle);
-	}
-
-	move_right(puzzle);
-	return 0;
-}
-
-void move_tile_src_dst(struct grid_info *puzzle, int xsrc, int ysrc, int xdst, int ydst)
-{
-	while (xsrc != xdst) {
-		if (xsrc > xdst) {
-			if (!move_tile_right(puzzle, xsrc, ysrc))
-				xsrc--;
-		}
-		else {
-			if (!move_tile_left(puzzle, xsrc, ysrc))
-				xsrc++;
-		}
-	}
-
-	while (ysrc != ydst) {
-		if (ysrc > ydst) {
-			if (!move_tile_down(puzzle, xsrc, ysrc))
-				ysrc--;
-		}
-		else {
-			if (!move_tile_up(puzzle, xsrc, ysrc))
-				ysrc++;
-		}
-	}
-}
-*/

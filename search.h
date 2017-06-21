@@ -7,13 +7,12 @@
 #include "control.h"
 
 struct search_info {
-	int *vals;
-	int *x;
-	int *y;
+	struct tile *pos;
+	struct tile *vals;
 	int sz;
 };
 
-struct search_info *init_search(int *vals, int sz);
+struct search_info *init_search(struct tile *vals, int sz);
 
 int apply_search(struct grid_info *puzzle, struct search_info *search);
 

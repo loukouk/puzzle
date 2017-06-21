@@ -16,9 +16,11 @@ int main(int argc, char ** argv)
 
 	for (i = 0; i < NUM_TEST; i++) {
 		puzzle[i] = init_grid(szx, szy);
+
 		printf("PUZZLE %d: Scrambling...\n", i + 1);
 		scramble_grid(puzzle[i], 200);
 		print_grid(puzzle[i]);
+	
 		printf("PUZZLE %d: Scramble Done. Solving...\n", i + 1);
 		if (auto_solve(puzzle[i])) {
 			fail_ids[ind] = i+1;

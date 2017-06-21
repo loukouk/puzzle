@@ -112,9 +112,9 @@ int main(int argc, char ** argv)
 	srand(time(NULL));
 
 	puzzle = init_grid(szx, szy);
-	scramble_grid(puzzle, 1000);
+	scramble_grid(puzzle, szx*szy*20);
 	print_grid(puzzle);
-	printf("\nScramble Done\n");
+	printf("Scramble Done\n");
 
 	if (player)
 		user_solve(puzzle);

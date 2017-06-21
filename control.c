@@ -1,16 +1,17 @@
 #include "control.h"
 
-int check_tile(struct grid_info *puzzle, int val, int xpos, int ypos)
+int check_tile(struct grid_info *puzzle, int x, int y)
 {
-	if (xpos >= puzzle->szx)
+	if (x > puzzle->szx-1 || x < 0)
+		return 1;
+	if (y > puzzle->szy-1 || y < 0)
 		return 1;
 
-	if (ypos >= puzzle->szy)
-		return 2;
-
-	if (puzzle->grid[xpos][ypos] != val)
+	if (puzzle->grid[x][y].x != x)
 		return -1;
-
+	if (puzzle->grid[x][y].y != y)
+		return -1;
+	
 	return 0;
 }
 
@@ -28,19 +29,22 @@ int check_tile(struct grid_info *puzzle, int val, int xpos, int ypos)
  */
 int move_right(struct grid_info *puzzle)
 {
-	int x = puzzle->xpos;
-	int y = puzzle->ypos;
+	int xpos = puzzle->xpos;
+	int ypos = puzzle->ypos;
 
-	if (x == 0) {
+	if (xpos == 0) {
 		return 1;
 	}
 
-	puzzle->grid[x][y] = puzzle->grid[x-1][y];
-	puzzle->grid[x-1][y] = 0;
+	puzzle->grid[xpos][ypos].x = puzzle->grid[xpos-1][ypos].x;
+	puzzle->grid[xpos][ypos].y = puzzle->grid[xpos-1][ypos].y;
+	puzzle->grid[xpos-1][ypos].x = 0;
+	puzzle->grid[xpos-1][ypos].y = 0;
 	puzzle->xpos--;
 
-	if (STEP_BY_STEP_PRINT)
-		print_grid(puzzle);
+	#if PUZZLE_PRINT_DEBUG == 1
+	print_grid(puzzle);
+	#endif
 
 	return 0;	
 }
@@ -59,19 +63,21 @@ int move_right(struct grid_info *puzzle)
  */
 int move_left(struct grid_info *puzzle)
 {
-	int x = puzzle->xpos;
-	int y = puzzle->ypos;
-
-	if (x == puzzle->szx-1) {
+	int xpos = puzzle->xpos;
+	int ypos = puzzle->ypos;
+	if (xpos >= puzzle->szx-1) {
 		return 1;
 	}
 
-	puzzle->grid[x][y] = puzzle->grid[x+1][y];
-	puzzle->grid[x+1][y] = 0;
+	puzzle->grid[xpos][ypos].x = puzzle->grid[xpos+1][ypos].x;
+	puzzle->grid[xpos][ypos].y = puzzle->grid[xpos+1][ypos].y;
+	puzzle->grid[xpos+1][ypos].x = 0;
+	puzzle->grid[xpos+1][ypos].y = 0;
 	puzzle->xpos++;
 
-	if (STEP_BY_STEP_PRINT)
-		print_grid(puzzle);
+	#if PUZZLE_PRINT_DEBUG == 1
+	print_grid(puzzle);
+	#endif
 
 	return 0;	
 }
@@ -90,19 +96,22 @@ int move_left(struct grid_info *puzzle)
  */
 int move_down(struct grid_info *puzzle)
 {
-	int x = puzzle->xpos;
-	int y = puzzle->ypos;
+	int xpos = puzzle->xpos;
+	int ypos = puzzle->ypos;
 
-	if (y == 0) {
+	if (ypos == 0) {
 		return 1;
 	}
 
-	puzzle->grid[x][y] = puzzle->grid[x][y-1];
-	puzzle->grid[x][y-1] = 0;
+	puzzle->grid[xpos][ypos].x = puzzle->grid[xpos][ypos-1].x;
+	puzzle->grid[xpos][ypos].y = puzzle->grid[xpos][ypos-1].y;
+	puzzle->grid[xpos][ypos-1].x = 0;
+	puzzle->grid[xpos][ypos-1].y = 0;
 	puzzle->ypos--;
 
-	if (STEP_BY_STEP_PRINT)
-		print_grid(puzzle);
+	#if PUZZLE_PRINT_DEBUG == 1
+	print_grid(puzzle);
+	#endif
 
 	return 0;	
 }
@@ -121,19 +130,22 @@ int move_down(struct grid_info *puzzle)
  */
 int move_up(struct grid_info *puzzle)
 {
-	int x = puzzle->xpos;
-	int y = puzzle->ypos;
+	int xpos = puzzle->xpos;
+	int ypos = puzzle->ypos;
 
-	if (y == puzzle->szy-1) {
+	if (ypos >= puzzle->szy-1) {
 		return 1;
 	}
 
-	puzzle->grid[x][y] = puzzle->grid[x][y+1];
-	puzzle->grid[x][y+1] = 0;
+	puzzle->grid[xpos][ypos].x = puzzle->grid[xpos][ypos+1].x;
+	puzzle->grid[xpos][ypos].y = puzzle->grid[xpos][ypos+1].y;
+	puzzle->grid[xpos][ypos+1].x = 0;
+	puzzle->grid[xpos][ypos+1].y = 0;
 	puzzle->ypos++;
 
-	if (STEP_BY_STEP_PRINT)
-		print_grid(puzzle);
+	#if PUZZLE_PRINT_DEBUG == 1
+	print_grid(puzzle);
+	#endif
 
 	return 0;	
 }
@@ -150,7 +162,7 @@ void print_grid(struct grid_info *puzzle)
 {
 	for (int j = puzzle->szy-1; j >= 0; j--) {
 		for (int i = puzzle->szx-1; i >= 0; i--) {
-			printf("%d\t", puzzle->grid[i][j]);
+			printf("(%d,%d)\t", puzzle->grid[i][j].x, puzzle->grid[i][j].y);
 		}
 		printf("\n");
 	}
@@ -177,13 +189,13 @@ struct grid_info *init_grid(int szx, int szy)
 	puzzle->szy = szy;
 	puzzle->xpos = 0;
 	puzzle->ypos = 0;
-	puzzle->xprev = -1;
-	puzzle->yprev = -1;
-	puzzle->grid = malloc(szx*sizeof(int *));
+	puzzle->grid = malloc(szx*sizeof(struct tile *));
 	for (int i = 0; i < szx; i++) {
-		puzzle->grid[i] = malloc(szy*sizeof(int));
-		for (int j = 0; j < szy; j++)
-			puzzle->grid[i][j] = i + j*szx;
+		puzzle->grid[i] = malloc(szy*sizeof(struct tile));
+		for (int j = 0; j < szy; j++) {
+			puzzle->grid[i][j].x = i;
+			puzzle->grid[i][j].y = j;
+		}
 	}
 
 	return puzzle;
@@ -200,13 +212,13 @@ struct grid_info *init_grid(int szx, int szy)
  */
 void scramble_grid(struct grid_info *puzzle, int num)
 {
-
+	int val;
 	for (int i = 0; i < num; i++) {
-		int val = rand() % 4;
+		val = rand() % 4;
 		switch(val) {
+			case 2:	move_left(puzzle); break;
 			case 0:	move_up(puzzle); break;
 			case 1:	move_down(puzzle); break;
-			case 2:	move_left(puzzle); break;
 			case 3:	move_right(puzzle); break;
 		}
 	}
@@ -230,9 +242,12 @@ int is_win(struct grid_info *puzzle)
 	int szy = puzzle->szy;
 	
 	for (int i = 0; i < szx; i++) {
-		for (int j = 0; j < szy; j++)
-			if (puzzle->grid[i][j] != i + j*szx)
+		for (int j = 0; j < szy; j++) {
+			if (puzzle->grid[i][j].x != i)
 				return 0;
+			if (puzzle->grid[i][j].y != j)
+				return 0;
+		}
 	}
 	return 1;
 }
