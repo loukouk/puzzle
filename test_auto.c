@@ -2,11 +2,11 @@
 #include <time.h>
 #include <string.h>
 
-#define NUM_TEST 10000
+#define NUM_TEST 1000
 
 int main(int argc, char ** argv)
 {
-	int szx = 3, szy = 3;
+	int szx = 3, szy = 99;
 	struct grid_info *puzzle[NUM_TEST];
 	int fail_ids[NUM_TEST+1], ind = 0;
 	int i;
@@ -18,7 +18,7 @@ int main(int argc, char ** argv)
 		puzzle[i] = init_grid(szx, szy);
 
 		printf("PUZZLE %d: Scrambling...\n", i + 1);
-		scramble_grid(puzzle[i], 200);
+		scramble_grid(puzzle[i], 1000);
 		print_grid(puzzle[i]);
 	
 		printf("PUZZLE %d: Scramble Done. Solving...\n", i + 1);

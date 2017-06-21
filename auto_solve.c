@@ -380,29 +380,56 @@ int fix_algorithm1(struct grid_info *puzzle)
 	printf("fix alg1\n");
 	#endif
 
-	move_x_y(puzzle, 0-(puzzle->xpos), 1-(puzzle->ypos));
+	move_x_y(puzzle, 0-(puzzle->xpos), (puzzle->szy-2)-(puzzle->ypos));
 
-	ret |= move_up(puzzle);
-	ret |= move_left(puzzle);
-	ret |= move_down(puzzle);
-	ret |= move_right(puzzle);
-	ret |= move_down(puzzle);
-	ret |= move_left(puzzle);
-	ret |= move_left(puzzle);
-	ret |= move_up(puzzle);
-	ret |= move_right(puzzle);
-	ret |= move_up(puzzle);
-	ret |= move_right(puzzle);
-	ret |= move_down(puzzle);
-	ret |= move_left(puzzle);
-	ret |= move_left(puzzle);
-	ret |= move_down(puzzle);
-	ret |= move_right(puzzle);
-	ret |= move_right(puzzle);
-	ret |= move_up(puzzle);
-	ret |= move_up(puzzle);
-	ret |= move_left(puzzle);
-	ret |= move_down(puzzle);
+	if (puzzle->szy >= 2 && puzzle->szx >= 3) {
+		ret |= move_up(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_down(puzzle);
+	}
+	else if (puzzle->szy >= 3 && puzzle->szx >= 2) {
+		ret |= move_up(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_down(puzzle);
+		ret |= move_right(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_up(puzzle);
+		ret |= move_left(puzzle);
+		ret |= move_down(puzzle);
+	}
+	else
+		return 1;
 
 	return ret;
 }
@@ -471,66 +498,49 @@ int fix_algorithm2(struct grid_info *puzzle)
 int solve_top_row(struct grid_info *puzzle)
 {
 	struct search_info *search;
-	struct tile val[1];
-	int a=-1, b=-1, c =-1;
+	struct tile val;
 
-	val->x = 2;
-	val->y = 2;
-	search = init_search(val, 1);
-	apply_search(puzzle, search);
-	move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 2, 2);
-
+	val.y = puzzle->szy-1;
+	for (int i = puzzle->szx-1; i > 1; i--) {
+		val.x = i;
+		search = init_search(&val, 1);
+		apply_search(puzzle, search);
+		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, val.x, val.y);
+	}
 	#if PUZZLE_PRINT_DEBUG == 1
-	printf("Done 8\n");
+	printf("Top row loop end\n");
 	#endif
 
-	val->x = 1;
-	val->y = 2;
-	search = init_search(val, 1);
+	val.x = 1;
+	search = init_search(&val, 1);
 	apply_search(puzzle, search);
-	move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 0, 2);
+	move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 0, val.y);
 
-	#if PUZZLE_PRINT_DEBUG == 1
-	printf("Done 7\nChecking pos (1,2)\n");
-	#endif
-
-	if (puzzle->xpos == 1 && puzzle->ypos == 2)
+	if (puzzle->xpos == 1 && puzzle->ypos == val.y)
 		move_down(puzzle);
 
-	val->x = 0;
-	val->y = 2;
-	search = init_search(val, 1);
+	val.x = 0;
+	search = init_search(&val, 1);
 	apply_search(puzzle, search);
-	#if PUZZLE_PRINT_DEBUG == 1
-	printf("Checking for alg req\n");
-	#endif
 
-	if (search->pos[0].x == 1 && search->pos[0].y == 2)
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("Checking for alg1 requirement\n");
+	#endif
+	if (search->pos[0].x == 1 && search->pos[0].y == val.y)
 		fix_algorithm1(puzzle);
 	else {
-		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 0, 1);
+		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 0, val.y-1);
 
-		#if PUZZLE_PRINT_DEBUG == 1
-		printf("Done 6\n");
-		#endif
-
-		move_x_y(puzzle, 1-(puzzle->xpos), 2-(puzzle->ypos));
+		move_x_y(puzzle, 1-(puzzle->xpos), (val.y)-(puzzle->ypos));
 		move_right(puzzle);
 		move_down(puzzle);
 	}
 
-	a = check_tile(puzzle, 2, 2);
-	b = check_tile(puzzle, 1, 2);
-	c = check_tile(puzzle, 0, 2);
-
-	#if PUZZLE_PRINT_DEBUG == 1
-	printf("Checking tiles: %d %d %d\n", a, b, c);
-	#endif
-
-	if (!a && !b && !c)
-		return 0;
-	else
-		return 1;
+	for (int i = 0; i < puzzle->szx; i++) {
+		if (check_tile(puzzle, i, val.y))
+			return 1;
+	}
+	return 0;
 
 }
 
@@ -542,7 +552,7 @@ int solve_top_row(struct grid_info *puzzle)
  * It is designed to solve it when there are only
  * two rows left. First reduce the puzzle using
  * the solve_top_row function. Execution not 
- * guaranteed if there are more than 2 rows left.
+ * guaranteed if there are more than 2 rows.
  *
  * puzzle: Pointer to structure containing puzzle to modify.
  *
@@ -552,43 +562,37 @@ int solve_top_row(struct grid_info *puzzle)
 int solve_left_col(struct grid_info *puzzle)
 {
 	struct search_info *search;
-	struct tile vals[2];
+	struct tile val;
 
-	vals[0].x = 2;
-	vals[1].x = 2;
-	vals[0].y = 1;
-	vals[1].y = 0;
-	search = init_search(vals, 2);
+	val.x = puzzle->szx-1;
+	val.y = 0;
+	search = init_search(&val, 1);
 	apply_search(puzzle, search);
 
-	move_tile_src_dst(puzzle, search->pos[1].x, search->pos[1].y, 2, 1);
-	#if PUZZLE_PRINT_DEBUG == 1
-	printf("Done 2\n");
-	#endif
+	move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, val.x, 1);
 
-	if (puzzle->xpos == 2 && puzzle->ypos == 0)
+	if (puzzle->xpos == val.x && puzzle->ypos == 0)
 		move_right(puzzle);
 
+	val.x = puzzle->szx-1;
+	val.y = 1;
+	search = init_search(&val, 1);
 	apply_search(puzzle, search);
 
 	#if PUZZLE_PRINT_DEBUG == 1
-	printf("Checking for fix alg2\n");
+	printf("Checking for alg2 requirement\n");
 	#endif
 
-	if (search->pos[0].x == 2 && search->pos[0].y == 0)
+	if (search->pos[0].x == val.x && search->pos[0].y == 0)
 		fix_algorithm2(puzzle);
 	else {
-		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, 1, 1);
+		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, val.x-1, 1);
 
-		#if PUZZLE_PRINT_DEBUG == 1
-		printf("Done 5\n");
-		#endif
-
-		move_y_x(puzzle, 0-(puzzle->ypos), 2-(puzzle->xpos));
+		move_y_x(puzzle, 0-(puzzle->ypos), (val.x)-(puzzle->xpos));
 		move_up(puzzle);
 		move_right(puzzle);
 	}
-	if (check_tile(puzzle, 2, 1) || check_tile(puzzle, 2, 0))
+	if (check_tile(puzzle, val.x, 1) || check_tile(puzzle, val.x, 0))
 		return 1;
 
 	return 0;
@@ -608,23 +612,34 @@ int solve_left_col(struct grid_info *puzzle)
  */
 int solve_final(struct grid_info *puzzle)
 {
+	struct tile t;
 	if (puzzle->szy != 2 || puzzle->szx != 2)
 		return 1;
 
-	int cnt = 0;
-
 	move_x_y(puzzle, 0-(puzzle->xpos), 0-(puzzle->ypos));
+	if (is_win(puzzle))
+		return 0;
 
-	while (!is_win(puzzle)) {
+	t.x = puzzle->grid[1][0].x;
+	t.y = puzzle->grid[1][0].y;
+
+	if (t.x == 1 && t.y == 1) {
 		move_up(puzzle);
 		move_left(puzzle);
 		move_down(puzzle);
 		move_right(puzzle);
-		cnt++;
-		if (cnt >= 4)
-			return 1;
 	}
-	return 0;
+	else if (t.x == 0 && t.y == 1) {
+		move_left(puzzle);
+		move_up(puzzle);
+		move_right(puzzle);
+		move_down(puzzle);
+	}
+
+	if (is_win(puzzle))
+		return 0;
+
+	return 1;
 }
 
 /*
@@ -641,14 +656,13 @@ int solve_final(struct grid_info *puzzle)
  */
 int auto_solve(struct grid_info *puzzle)
 {
-	if (puzzle->szx != 3 || puzzle->szy != 3) {
-		printf("AI solve for grid different than 3x3 not yet supported\n");
-		exit(EXIT_FAILURE);
-	}
-
 	int szx, szy, ret;
 	szx = puzzle->szx;
 	szy = puzzle->szy;
+
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("Starting to solve top rows\n");
+	#endif
 
 	while (puzzle->szy > 2) {
 		if (solve_top_row(puzzle))
@@ -657,12 +671,20 @@ int auto_solve(struct grid_info *puzzle)
 		puzzle->szy--;
 	}
 
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("Staring to solve left columns\n");
+	#endif
+
 	while (puzzle->szx > 2) {
 		if (solve_left_col(puzzle))
 			return 1;
 
 		puzzle->szx--;
 	}
+
+	#if PUZZLE_PRINT_DEBUG == 1
+	printf("Starting final solve step\n");
+	#endif
 
 	ret = solve_final(puzzle);
 	puzzle->szx = szx;
