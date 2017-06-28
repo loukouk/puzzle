@@ -6,10 +6,10 @@
 
 int main(int argc, char ** argv)
 {
-	int szx = 4, szy = 4;
+	int szx = 10, szy = 10;
 	struct grid_info *puzzle[NUM_TEST];
 	int fail_ids[NUM_TEST+1], ind = 0;
-	int i;
+	int i, a, b, c, d;
 
 	memset(fail_ids, 0, (NUM_TEST+1)*sizeof(int));
 	srand(time(NULL));
@@ -26,7 +26,11 @@ int main(int argc, char ** argv)
 			fail_ids[ind] = i+1;
 			ind++;
 		}
-		printf("PUZZLE %d: Solving Done.\n", i + 1);
+		a = puzzle[i]->moves[UP];
+		b = puzzle[i]->moves[DOWN];
+		c = puzzle[i]->moves[LEFT];
+		d = puzzle[i]->moves[RIGHT];
+		printf("PUZZLE %d: Solving Done. UP:%d DOWN:%d LEFT:%d RIGHT:%d TOTAL:%d\n",i + 1, a, b, c, d, a+b+c+d);
 	}
 
 	i = 0;

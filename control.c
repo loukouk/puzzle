@@ -54,9 +54,10 @@ int move_right(struct grid_info *puzzle)
 	puzzle->grid[xpos-1][ypos].x = 0;
 	puzzle->grid[xpos-1][ypos].y = 0;
 	puzzle->xpos--;
+	puzzle->moves[RIGHT]++;
 
 	#if PUZZLE_PRINT_DEBUG == 1
-	print_grid(puzzle);
+	if (puzzle->state != STATE_SCRAMBLE) print_grid(puzzle);
 	#endif
 
 	return 0;	
@@ -87,9 +88,10 @@ int move_left(struct grid_info *puzzle)
 	puzzle->grid[xpos+1][ypos].x = 0;
 	puzzle->grid[xpos+1][ypos].y = 0;
 	puzzle->xpos++;
+	puzzle->moves[LEFT]++;
 
 	#if PUZZLE_PRINT_DEBUG == 1
-	print_grid(puzzle);
+	if (puzzle->state != STATE_SCRAMBLE) print_grid(puzzle);
 	#endif
 
 	return 0;	
@@ -121,9 +123,10 @@ int move_down(struct grid_info *puzzle)
 	puzzle->grid[xpos][ypos-1].x = 0;
 	puzzle->grid[xpos][ypos-1].y = 0;
 	puzzle->ypos--;
+	puzzle->moves[DOWN]++;
 
 	#if PUZZLE_PRINT_DEBUG == 1
-	print_grid(puzzle);
+	if (puzzle->state != STATE_SCRAMBLE) print_grid(puzzle);
 	#endif
 
 	return 0;	
@@ -155,9 +158,10 @@ int move_up(struct grid_info *puzzle)
 	puzzle->grid[xpos][ypos+1].x = 0;
 	puzzle->grid[xpos][ypos+1].y = 0;
 	puzzle->ypos++;
+	puzzle->moves[UP]++;
 
 	#if PUZZLE_PRINT_DEBUG == 1
-	print_grid(puzzle);
+	if (puzzle->state != STATE_SCRAMBLE) print_grid(puzzle);
 	#endif
 
 	return 0;	
@@ -198,11 +202,12 @@ struct grid_info *init_grid(int szx, int szy)
 {
 	struct grid_info *puzzle = malloc(sizeof(struct grid_info));
 
-	puzzle->num_solved = 0;
+	puzzle->state = STATE_INIT;
 	puzzle->szx = szx;
 	puzzle->szy = szy;
 	puzzle->xpos = 0;
 	puzzle->ypos = 0;
+
 	puzzle->grid = malloc(szx*sizeof(struct tile *));
 	for (int i = 0; i < szx; i++) {
 		puzzle->grid[i] = malloc(szy*sizeof(struct tile));
@@ -211,6 +216,8 @@ struct grid_info *init_grid(int szx, int szy)
 			puzzle->grid[i][j].y = j;
 		}
 	}
+
+	for (int i = 0; i < 4; i++) puzzle->moves[i] = 0;
 
 	return puzzle;
 }
@@ -227,6 +234,9 @@ struct grid_info *init_grid(int szx, int szy)
 void scramble_grid(struct grid_info *puzzle, int num)
 {
 	int val;
+	
+	puzzle->state = STATE_SCRAMBLE;
+
 	for (int i = 0; i < num; i++) {
 		val = rand() % 4;
 		switch(val) {

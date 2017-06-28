@@ -46,6 +46,8 @@ void user_solve(struct grid_info *puzzle)
 {
 	char c;
 
+	puzzle->state = STATE_SOLVE;
+
 	while(1) {
 		print_grid(puzzle);
 		while ((c = getchar()) != '\n' && c != EOF) {
@@ -57,8 +59,10 @@ void user_solve(struct grid_info *puzzle)
 			}
 		}
 
-		if(is_win(puzzle))
+		if(is_win(puzzle)) {
+			puzzle->state = STATE_INIT;
 			break;
+		}
 	}
 
 	printf("YOU WIN :D\n");

@@ -23,15 +23,6 @@ int move_auto(struct grid_info *puzzle, int x, int y)
 	printf("Entering move_auto: x=%d y=%d\n", x, y);
 	#endif
 
-/* DOES NOT WORK
-	// Check if the hole is going to move through already solved tiles
-	if (puzzle->num_solved >= (puzzle->szx)-(puzzle->xpos) && puzzle->szy-1 == puzzle->ypos + y) {
-		move_down(puzzle);
-		move_right(puzzle);
-		move_right(puzzle);
-	}
-*/
-
 	if (y <= 0) {
 		for ( ; y < 0; y++) { 
 			if (move_down(puzzle))
@@ -244,6 +235,21 @@ int move_tile_up(struct grid_info *puzzle, int xsrc, int ysrc)
 	//	o	dst	x	x
 	//	(0,0)	src	x	x
 	//	x	x	x	x
+
+	// Check if the hole is going to move through already solved tiles
+	if (puzzle->state >= (puzzle->szx)-(puzzle->xpos)
+	&&  ysrc == puzzle->szy-2
+	&&  xsrc == (puzzle->szx-1)-(puzzle->state)) {
+
+		#if PUZZLE_PRINT_DEBUG==1
+		printf("Move UP special case\n");
+		#endif 
+
+		move_y_x(puzzle, y-2, x);
+		x = 0;
+		y = 2;
+	}
+
 
 	if (y > 1 && x == 0) {
 		move_y_x(puzzle, y-2, 0);
@@ -588,15 +594,17 @@ int solve_top_row(struct grid_info *puzzle)
 	struct search_info *search;
 	struct tile val;
 
-	puzzle->num_solved = 0;
+	puzzle->state = STATE_SOLVE;
 	val.y = puzzle->szy-1;
 	for (int i = puzzle->szx-1; i > 1; i--) {
 		val.x = i;
 		search = init_search(&val, 1);
 		apply_search(puzzle, search);
 		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, val.x, val.y);
-		puzzle->num_solved++;
+		puzzle->state++;
 	}
+	puzzle->state = STATE_SOLVE;
+
 	#if PUZZLE_PRINT_DEBUG == 1
 	printf("Top row loop end\n");
 	#endif
@@ -726,8 +734,10 @@ int solve_final(struct grid_info *puzzle)
 		move_down(puzzle);
 	}
 
-	if (is_win(puzzle))
+	if (is_win(puzzle)) {
+		puzzle->state = STATE_INIT;
 		return 0;
+	}
 
 	return 1;
 }
@@ -749,6 +759,8 @@ int auto_solve(struct grid_info *puzzle)
 	int szx, szy, ret;
 	szx = puzzle->szx;
 	szy = puzzle->szy;
+
+	puzzle->state = STATE_SOLVE;
 
 	#if PUZZLE_PRINT_DEBUG == 1
 	printf("Starting to solve top rows\n");

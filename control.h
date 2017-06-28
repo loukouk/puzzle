@@ -4,15 +4,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//define to 1 to print debug statements at runtime
 #define PUZZLE_PRINT_DEBUG 1
 
+//indexes for moves array in struct grid_info
+#define UP 0
+#define DOWN 1
+#define LEFT 2
+#define RIGHT 3
+
+#define STATE_INIT -2
+#define STATE_SCRAMBLE -1
+#define STATE_SOLVE 0
+
 struct grid_info {
-	struct tile **grid;
-	int szx;
-	int szy;
-	int xpos;
-	int ypos;
-	int num_solved;
+	struct tile **grid;	//grid of tiles that make up puzzle
+	int szx;		//width of puzzle
+	int szy;		//height of puzzle
+	int xpos;		//x position of the hole (0,0)
+	int ypos;		//y position of the hole
+	int moves[4];		//numbers of moves done on the puzzle
+	int state;		//state (solving, scrambling, done)
 };
 
 struct tile {
