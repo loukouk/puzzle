@@ -6,7 +6,7 @@
 
 int main(int argc, char ** argv)
 {
-	int szx = 3, szy = 99;
+	int szx = 4, szy = 4;
 	struct grid_info *puzzle[NUM_TEST];
 	int fail_ids[NUM_TEST+1], ind = 0;
 	int i;
@@ -30,7 +30,7 @@ int main(int argc, char ** argv)
 	}
 
 	i = 0;
-	printf("FAILURES:");
+	printf("%d FAILURES:", ind);
 	while (fail_ids[i] != 0) {
 		printf(" %d", fail_ids[i]);
 		i++;

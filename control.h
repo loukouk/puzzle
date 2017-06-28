@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PUZZLE_PRINT_DEBUG 0
+#define PUZZLE_PRINT_DEBUG 1
 
 struct grid_info {
 	struct tile **grid;
@@ -12,6 +12,7 @@ struct grid_info {
 	int szy;
 	int xpos;
 	int ypos;
+	int num_solved;
 };
 
 struct tile {

@@ -1,5 +1,68 @@
 #include "auto_solve.h"
 
+
+/*
+ * Function: move_auto
+ * -------------------
+ * 
+ * Moves the hole by a number of tiles specified by the x and y
+ * values. This function prioritizes movement in the following
+ * ways: DOWN, RIGHT, LEFT, UP
+ *
+ * puzzle: Pointer to structure containing puzzle to be solved.
+ * x: number of moves to be made in x direction.
+ *    + is left direction, - is right
+ * y: number of moves to be made in y direction.
+ *    + is up, - is down
+ *
+ * returns 1 if any moves fail, and 0 success
+ */
+int move_auto(struct grid_info *puzzle, int x, int y)
+{
+	#if PUZZLE_PRINT_DEBUG==1
+	printf("Entering move_auto: x=%d y=%d\n", x, y);
+	#endif
+
+/* DOES NOT WORK
+	// Check if the hole is going to move through already solved tiles
+	if (puzzle->num_solved >= (puzzle->szx)-(puzzle->xpos) && puzzle->szy-1 == puzzle->ypos + y) {
+		move_down(puzzle);
+		move_right(puzzle);
+		move_right(puzzle);
+	}
+*/
+
+	if (y <= 0) {
+		for ( ; y < 0; y++) { 
+			if (move_down(puzzle))
+				return 1;
+		}
+	}
+
+	if (x <= 0) {
+		for ( ; x < 0; x++) {
+			if (move_right(puzzle))
+				return 1;
+		}
+	}
+	else {
+		for ( ; x > 0; x--) { 
+			if (move_left(puzzle))
+				return 1;
+		}
+	}
+	
+
+	if (y > 0) {
+		for ( ; y > 0; y--) { 
+			if (move_up(puzzle))
+				return 1;
+		}
+	}
+
+	return 0;
+}
+
 /*
  * Function: move_x_y
  * ------------------
@@ -121,29 +184,34 @@ int move_tile_down(struct grid_info *puzzle, int xsrc, int ysrc)
 	x = xsrc - puzzle->xpos;
 	y = ysrc-1 - puzzle->ypos;
 
-	if (x == 0 && y < -1) {
+	if (x == 0 && y == -1)
+		return 1;
+
+	if (y < -1 && x == 0) {
+		move_y_x(puzzle, y+2, 0);
 		if (move_right(puzzle)) {
 			move_left(puzzle);
 			x--;
 		}
 		else
 			x++;
+		move_y_x(puzzle, 2, x);
 	}
-	
-	if (x > 1) {
-		move_y_x(puzzle, 0, x-1);
-		move_y_x(puzzle, y, 1);
+	else if (y < 0 && x > 0) {
+		move_auto(puzzle, x-1, y);
+		move_left(puzzle);
 	}
-	else if (x < -1) {
-		move_y_x(puzzle, 0, x+1);
-		move_y_x(puzzle, y, -1);
+	else if (y < 0 && x < 0) {
+		move_auto(puzzle, x+1, y);
+		move_right(puzzle);
 	}
 	else
-		move_y_x(puzzle, y, x);
+		move_auto(puzzle, x, y);
+
 
 	move_up(puzzle);
 	return 0;
-}
+} 
 
 /*
  * Function: move_tile_up
@@ -169,25 +237,35 @@ int move_tile_up(struct grid_info *puzzle, int xsrc, int ysrc)
 	x = xsrc - puzzle->xpos;
 	y = ysrc+1 - puzzle->ypos;
 
-	if (x == 0 && y > 1) {
+	if (x == 0 && y == 1)
+		return 1;
+
+	//TODO insert fix here for:
+	//	o	dst	x	x
+	//	(0,0)	src	x	x
+	//	x	x	x	x
+
+	if (y > 1 && x == 0) {
+		move_y_x(puzzle, y-2, 0);
 		if (move_right(puzzle)) {
 			move_left(puzzle);
 			x--;
 		}
 		else
 			x++;
+		move_y_x(puzzle, 2, x);
 	}
-
-	if (x > 1) {
-		move_y_x(puzzle, 0, x-1);
-		move_y_x(puzzle, y, 1);
+	else if (y > 0 && x > 0) {
+		move_auto(puzzle, x-1, y);
+		move_left(puzzle);
 	}
-	else if (x < -1) {
-		move_y_x(puzzle, 0, x+1);
-		move_y_x(puzzle, y, -1);
+	else if (y > 0 && x < 0) {
+		move_auto(puzzle, x+1, y);
+		move_right(puzzle);
 	}
 	else
-		move_y_x(puzzle, y, x);
+		move_auto(puzzle, x, y);
+
 
 	move_down(puzzle);
 	return 0;
@@ -217,29 +295,34 @@ int move_tile_right(struct grid_info *puzzle, int xsrc, int ysrc)
 	x = xsrc-1 - puzzle->xpos;
 	y = ysrc - puzzle->ypos;
 
-	if (y == 0 && x < -1) {
+	if (x == -1 && y == 0)
+		return 1;
+
+	if (x < -1 && y == 0) {
+		move_x_y(puzzle, x+2, 0);
 		if (move_down(puzzle)) {
 			move_up(puzzle);
 			y--;
 		}
 		else
 			y++;
+		move_x_y(puzzle, -2, y);
 	}
-
-	if (y > 1) {
-		move_x_y(puzzle, 0, y-1);
-		move_x_y(puzzle, x, 1);
+	else if (x < 0 && y > 0) {
+		move_auto(puzzle, x, y-1);
+		move_up(puzzle);
 	}
-	else if (y < -1){
-		move_x_y(puzzle, 0, y+1);
-		move_x_y(puzzle, x, -1);
+	else if (x < 0 && y < 0) {
+		move_auto(puzzle, x, y+1);
+		move_down(puzzle);
 	}
 	else
-		move_x_y(puzzle, x, y);
+		move_auto(puzzle, x, y);
+
 
 	move_left(puzzle);
 	return 0;
-}
+} 
 
 /*
  * Function: move_tile_left
@@ -265,29 +348,34 @@ int move_tile_left(struct grid_info *puzzle, int xsrc, int ysrc)
 	x = xsrc+1 - puzzle->xpos;
 	y = ysrc - puzzle->ypos;
 
-	if (y == 0 && x > 1) {
+	if (x == 1 && y == 0)
+		return 1;
+
+	if (x > 1 && y == 0) {
+		move_x_y(puzzle, x-2, 0);
 		if (move_down(puzzle)) {
 			move_up(puzzle);
 			y--;
 		}
 		else
 			y++;
+		move_x_y(puzzle, 2, y);
 	}
-
-	if (y > 1) {
-		move_x_y(puzzle, 0, y-1);
-		move_x_y(puzzle, x, 1);
+	else if (x > 0 && y > 0) {
+		move_auto(puzzle, x, y-1);
+		move_up(puzzle);
 	}
-	else if (y < -1){
-		move_x_y(puzzle, 0, y+1);
-		move_x_y(puzzle, x, -1);
+	else if (x > 0 && y < 0) {
+		move_auto(puzzle, x, y+1);
+		move_down(puzzle);
 	}
 	else
-		move_x_y(puzzle, x, y);
+		move_auto(puzzle, x, y);
+
 
 	move_right(puzzle);
 	return 0;
-}
+} 
 
 /*
  * Function: move_tile_src_dst
@@ -457,7 +545,7 @@ int fix_algorithm2(struct grid_info *puzzle)
 	printf("fix alg2\n");
 	#endif
 
-	move_x_y(puzzle, 1-(puzzle->xpos), 1-(puzzle->ypos));
+	move_x_y(puzzle, (puzzle->szx-2)-(puzzle->xpos), 1-(puzzle->ypos));
 
 	ret |= move_left(puzzle);
 	ret |= move_down(puzzle);
@@ -500,12 +588,14 @@ int solve_top_row(struct grid_info *puzzle)
 	struct search_info *search;
 	struct tile val;
 
+	puzzle->num_solved = 0;
 	val.y = puzzle->szy-1;
 	for (int i = puzzle->szx-1; i > 1; i--) {
 		val.x = i;
 		search = init_search(&val, 1);
 		apply_search(puzzle, search);
 		move_tile_src_dst(puzzle, search->pos[0].x, search->pos[0].y, val.x, val.y);
+		puzzle->num_solved++;
 	}
 	#if PUZZLE_PRINT_DEBUG == 1
 	printf("Top row loop end\n");
