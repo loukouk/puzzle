@@ -22,6 +22,7 @@ test: $(TESTS) $(SRCS) $(HEADERS)
 	$(CC) $(SRCS) test_search.c $(CFLAGS) -o test_search
 	$(CC) $(SRCS) test_control.c $(CFLAGS) -o test_control
 	$(CC) $(SRCS) test_auto.c $(CFLAGS) -o test_auto
+	$(CC) $(SRCS) test_data.c $(CFLAGS) -o test_data
 
 debugtest: $(TESTS) $(SRCS) $(HEADERS)
 	$(CC) $(SRCS) test_search.c $(CFLAGS) -o test_search -DEBUG

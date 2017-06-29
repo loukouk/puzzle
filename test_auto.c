@@ -6,7 +6,7 @@
 
 int main(int argc, char ** argv)
 {
-	int szx = 10, szy = 10;
+	int szx = 2, szy = 2;
 	struct grid_info *puzzle[NUM_TEST];
 	int fail_ids[NUM_TEST+1], ind = 0;
 	int i, a, b, c, d;

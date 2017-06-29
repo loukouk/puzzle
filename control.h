@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 //define to 1 to print debug statements at runtime
-#define PUZZLE_PRINT_DEBUG 1
+#define PUZZLE_PRINT_DEBUG 0
 
 //indexes for moves array in struct grid_info
 #define UP 0
