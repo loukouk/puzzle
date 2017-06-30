@@ -42,6 +42,7 @@ struct grid_info *init_grid(int szx, int szy);
 
 void print_grid(struct grid_info *puzzle);
 void scramble_grid(struct grid_info *puzzle, int num);
+void del_grid(struct grid_info *puzzle);
 
 int is_win(struct grid_info *puzzle);
 #endif

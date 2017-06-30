@@ -42,6 +42,22 @@ struct search_info *init_search(struct tile *vals, int sz)
 }
 
 /*
+ * Function: del_search
+ * --------------------
+ *
+ * This function deletes a search_info structure properly.
+ * Using this function ensures that all memory used is 
+ * properly returned to the OS for future reuse.
+ *
+ * search: Pointer to structure to be deleted
+ */
+void del_search(struct search_info * search)
+{
+	free(search->pos);
+	free(search);
+}
+
+/*
  * Function: apply_search
  * ----------------------
  *

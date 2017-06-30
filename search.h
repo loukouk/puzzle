@@ -17,5 +17,6 @@ struct search_info *init_search(struct tile *vals, int sz);
 int apply_search(struct grid_info *puzzle, struct search_info *search);
 
 void print_search(struct search_info *search);
+void del_search(struct search_info *search);
 
 #endif

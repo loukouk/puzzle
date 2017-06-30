@@ -223,6 +223,25 @@ struct grid_info *init_grid(int szx, int szy)
 }
 
 /*
+ * Function: del_grid
+ * ------------------
+ *
+ * Deletes a grid_info structure.
+ * This function must be used to ensure that all
+ * memory is properly returned to OS after use
+ *
+ * puzzle: Pointer to structure to be deleted
+ */
+void del_grid(struct grid_info *puzzle)
+{
+	for (int i = 0; i < puzzle->szx; i++) {
+		free(puzzle->grid[i]);
+	}
+	free(puzzle->grid);
+	free(puzzle);
+}
+
+/*
  * Function: scramble_grid
  * -----------------------
  *
